@@ -40,12 +40,11 @@ function setScene() {
     light.shadow.mapSize.width = 1024;
     light.shadow.mapSize.height = 1024;
     scene.add( light );
-
 }
 
 function addGeometry() {
     var geometry = new THREE.BoxBufferGeometry( 40, 40, 40 );
-    for ( var i = 0; i < 200; i ++ ) {
+    for ( var i = 0; i < 20; i ++ ) {
         var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
         object.position.x = Math.random() * 1000 - 500;
         object.position.y = Math.random() * 600 - 300;
@@ -64,11 +63,17 @@ function addGeometry() {
 }
 
 function setupUtilities() {
+
     var axisHelper = new THREE.AxisHelper( 3 );
     scene.add( axisHelper );
 
-    var gridHelper = new THREE.GridHelper( 20, 20 );
-    scene.add( gridHelper );
+    // var gridHelper = new THREE.GridHelper( 20, 20 );
+    // scene.add( gridHelper );
+
+    var grid = new THREE.GridHelper( 2000, 20, 0x000000, 0x000000 );
+    grid.material.opacity = 0.2;
+    grid.material.transparent = true;
+    scene.add( grid );
 }
 
 function setupDragControls() {
@@ -113,6 +118,7 @@ const WorkerWebGL = {
 
         container = document.getElementById(id);
         camera.position.z = 1000;
+        camera.position.y = 300;
         renderer.setPixelRatio( window.devicePixelRatio );
         renderer.setSize( window.innerWidth, window.innerHeight );
         renderer.shadowMap.enabled = true;
