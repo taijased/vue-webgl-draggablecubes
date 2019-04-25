@@ -1,20 +1,16 @@
-// import TransformControls from 'three-transform-controls';
-
-
-
 const THREE = require('three')
 
-let container, controls, transformControl, orbit;
+let container, transformControl, orbit;
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 5000  );
-const TrackballControls = require('three-trackballcontrols')
 const TransformControls = require('three-transform-controls')(THREE);
 const OrbitControls = require('three-orbitcontrols')
 
 var objects = [];
 
+
 let renderer = new THREE.WebGLRenderer({
-    // alpha: true,
+    alpha: true,
     antialias: true
 });
 
@@ -34,50 +30,20 @@ function setScene() {
 }
 
 function addGeometry() {
-    // var geometry = new THREE.BoxBufferGeometry( 40, 40, 40 );
-    // for ( var i = 0; i < 1; i ++ ) {
-    //     var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
-    //     object.position.x = Math.random() * 1000 - 500;
-    //     object.position.y = Math.random() * 600 - 300;
-    //     object.position.z = Math.random() * 800 - 400;
-    //     object.rotation.x = Math.random() * 2 * Math.PI;
-    //     object.rotation.y = Math.random() * 2 * Math.PI;
-    //     object.rotation.z = Math.random() * 2 * Math.PI;
-    //     object.scale.x = Math.random() * 2 + 1;
-    //     object.scale.y = Math.random() * 2 + 1;
-    //     object.scale.z = Math.random() * 2 + 1;
-    //     object.castShadow = true;
-    //     object.receiveShadow = true;
-    //     scene.add( object );
-    //     objects.push( object );
-    //     transformControl.attach( object );
 
-    // }
-
-    const path = ['https://threejs.org/examples/models/collada/elf/elf.dae']
+    const path = 'https://threejs.org/examples/models/collada/elf/elf.dae'
 
     var ColladaLoader = require('three-collada-loader');
     let loader = new ColladaLoader();
     loader.options.convertUpAxis = true;
-
-    for (let i = 0; i < path.length; i++ ) {
-
-
-
-        loader.load( path[i], collada => {
-            let dae = collada.scene;
-            
-
-
-            dae.position.set(0, 0, 0);
-            dae.scale.set(50, 50, 50);
-            scene.add(dae);
-            objects.push( dae );
-            transformControl.attach( dae );
-           
-            // addHelpers(dae)
-        });
-    }
+    loader.load( path, collada => {
+        let dae = collada.scene;
+        dae.position.set(0, 0, 0);
+        dae.scale.set(50, 50, 50);
+        scene.add(dae);
+        objects.push( dae );
+        transformControl.attach( dae );
+    });
 }
 
 function setupUtilities() {
@@ -92,12 +58,15 @@ function setupControls() {
     orbit = new OrbitControls( camera, renderer.domElement );
     orbit.update();
     orbit.addEventListener( 'change', render );
+
     
     transformControl = new TransformControls( camera, renderer.domElement );
     transformControl.addEventListener( 'change', render );
     transformControl.addEventListener( 'dragging-changed', function ( event ) {
         orbit.enabled = ! event.value;
     } );
+
+
     scene.add( transformControl );
     window.addEventListener( 'resize', onWindowResize, false );
     window.addEventListener( 'keydown', function ( event ) {
@@ -148,6 +117,7 @@ function setupControls() {
                 break;
         }
     } );
+   
 }
 
 function onWindowResize() {

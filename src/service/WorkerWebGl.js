@@ -1,6 +1,5 @@
 // import DragControls from 'drag-controls'
 
-import DragControls from 'three-dragcontrols';
 
 const THREE = require('three')
 
@@ -9,6 +8,7 @@ const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 5000  );
 const TrackballControls = require('three-trackballcontrols')
 const TransformControls = require('three-transform-controls')(THREE)
+
 var hiding;
 
 var objects = [];
