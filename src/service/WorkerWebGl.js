@@ -4,11 +4,13 @@ import DragControls from 'three-dragcontrols';
 
 const THREE = require('three')
 
-let container, controls;
+let container, controls, transformControl;
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 5000  );
 const TrackballControls = require('three-trackballcontrols')
-// const DragControls = require('three-dragcontrols')
+const TransformControls = require('three-transform-controls')(THREE)
+var hiding;
+
 var objects = [];
 
 let renderer = new THREE.WebGLRenderer({
@@ -44,7 +46,7 @@ function setScene() {
 
 function addGeometry() {
     var geometry = new THREE.BoxBufferGeometry( 40, 40, 40 );
-    for ( var i = 0; i < 20; i ++ ) {
+    for ( var i = 0; i < 2; i ++ ) {
         var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
         object.position.x = Math.random() * 1000 - 500;
         object.position.y = Math.random() * 600 - 300;
@@ -60,12 +62,66 @@ function addGeometry() {
         scene.add( object );
         objects.push( object );
     }
+    // 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/392/iphone6.dae', 
+    const path = ['https://threejs.org/examples/models/collada/elf/elf.dae']
+
+    var ColladaLoader = require('three-collada-loader');
+    let loader = new ColladaLoader();
+    loader.options.convertUpAxis = true;
+
+    for (let i = 0; i < path.length; i++ ) {
+
+
+
+        loader.load( path[i], collada => {
+            let dae = collada.scene;
+            
+
+
+            dae.position.set(0, 0, 0);
+            dae.scale.set(50, 50, 50);
+            scene.add(dae);
+            objects.push( dae );
+
+           
+            addHelpers(dae)
+        });
+    }
+    
+}
+
+function addHelpers(object) {
+   
+
+    // var object = new THREE.Mesh( model, new THREE.MeshBasicMaterial( 0xff0000 ) );
+    // var box = new THREE.BoxHelper( object, 0xffff00 );
+    // var helper = new THREE.Box3Helper( box, 0xffff00 );
+    // scene.add( helper );
+
+    // scene.add(box)
+    // scene.add( new THREE.BoxHelper( object ) );
+
+	// var wireframe = new THREE.WireframeGeometry( model );
+    // var line = new THREE.LineSegments( wireframe );
+    // line.material.depthTest = false;
+    // line.material.opacity = 0.25;
+    // line.material.transparent = true;
+    // line.position.x = 4;
+    // // group.add( line );
+    // scene.add( new THREE.BoxHelper( line ) );
+
+    // var axisHelper = new THREE.AxisHelper( 10 );
+    // object.add( axisHelper );
+
+
+   
+    // object.add( helper );
+
 }
 
 function setupUtilities() {
 
-    var axisHelper = new THREE.AxisHelper( 3 );
-    scene.add( axisHelper );
+    
 
     // var gridHelper = new THREE.GridHelper( 20, 20 );
     // scene.add( gridHelper );
@@ -78,14 +134,67 @@ function setupUtilities() {
 
 function setupDragControls() {
     var dragControls = new DragControls( objects, camera, renderer.domElement );
-    dragControls.addEventListener( 'dragstart', function () {
+    dragControls.addEventListener( 'dragstart', () => {
         controls.enabled = false;
-    } );
-    dragControls.addEventListener( 'dragend', function () {
+    });
+    dragControls.addEventListener( 'dragend', () => {
         controls.enabled = true;
+    });
+
+    dragControls.addEventListener( 'hoveron', function ( event ) {
+        transformControl.attach( event.object );
+        cancelHideTransform();
+    } );
+    dragControls.addEventListener( 'hoveroff', function () {
+        delayHideTransform();
     } );
 
 }
+
+function delayHideTransform() {
+    cancelHideTransform();
+    hideTransform();
+}
+function hideTransform() {
+    hiding = setTimeout( function () {
+        transformControl.detach( transformControl.object );
+    }, 2500 );
+}
+function cancelHideTransform() {
+    if ( hiding ) clearTimeout( hiding );
+}
+
+
+
+
+
+function setupTransformControls() {
+
+    transformControl = new TransformControls( camera, renderer.domElement );
+    transformControl.addEventListener( 'change', render );
+    
+    scene.add( transformControl );
+    // Hiding transform situation is a little in a mess :()
+    transformControl.addEventListener( 'change', function () {
+        cancelHideTransform();
+    } );
+    transformControl.addEventListener( 'mouseDown', function () {
+        cancelHideTransform();
+    } );
+    transformControl.addEventListener( 'mouseUp', function () {
+        delayHideTransform();
+    } );
+    transformControl.addEventListener( 'objectChange', function () {
+        console.log("new position")
+    } );
+}
+
+
+
+
+
+
+
 
 
 function windowResizing() {
@@ -148,8 +257,10 @@ const WorkerWebGL = {
         // Setup DragControls
         /////////////////////////////////////////
         setupDragControls()
-    
-
+        /////////////////////////////////////////
+        // Setup TransformControls
+        /////////////////////////////////////////
+        setupTransformControls()
         animate();
     }
   
