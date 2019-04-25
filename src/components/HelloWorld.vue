@@ -26,13 +26,14 @@
 </template>
 
 <script>
-import WorkerWebGl from '../service/WorkerWebGl.js';
+// import WorkerWebGl from '../service/WorkerWebGl.js';
+import WorkerControl from '../service/WorkerControl.js';
 
 export default {
   created () {
     this.$nextTick(() => {
       setTimeout(() => {
-        WorkerWebGl.setupScene('draggable-cubes') 
+        WorkerControl.setupScene('draggable-cubes') 
       }, 1000);
     })
   }
